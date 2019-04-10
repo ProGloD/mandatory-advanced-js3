@@ -24,7 +24,7 @@ class SignUp extends Component {
     const data = { ...this.state.data };
     data[e.target.id] = e.target.value;
 
-    this.setState({ data: data });
+    this.setState({ data });
   }
 
   onSubmit(e) {
@@ -58,27 +58,24 @@ class SignUp extends Component {
 
         <main>
           <form onSubmit={this.onSubmit}>
-            <div>
-              <p>Email:</p>
-              <input
-                id="email"
-                type="email"
-                onChange={this.handleInputs}
-                required
-                value={data.email}
-              />
-            </div>
-            <div>
-              <p>Password:</p>
-              <input
-                id="password"
-                type="password"
-                onChange={this.handleInputs}
-                required
-                value={data.password}
-              />
-            </div>
+            <p>Email:</p>
+            <input
+              id="email"
+              type="email"
+              onChange={this.handleInputs}
+              required
+              value={data.email}
+            />
+            <p>Password:</p>
+            <input
+              id="password"
+              type="password"
+              onChange={this.handleInputs}
+              required
+              value={data.password}
+            />
             {failed ? <p>{status}</p> : null}
+            <br />
             <input type="submit" value="Sign up" />
           </form>
         </main>

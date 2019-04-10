@@ -4,35 +4,13 @@ import { Link, Redirect } from "react-router-dom";
 import { token$ } from "./store";
 
 class Home extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      token: token$.value,
-      signed: false
-    };
-
-    this.SignIn = this.SignIn.bind(this);
-  }
-
-  componentDidMount() {
-    const { token } = this.state;
-
-    if (token) {
-      this.SignIn();
-    }
-  }
-
-  SignIn() {
-    const { signed } = this.state;
-
-    this.setState({ signed: !signed });
-  }
+  state = {
+    token: token$.value
+  }; 
 
   render() {
-    const { signed } = this.state;
 
-    if (signed) {
+    if (this.state.token) {
       return <Redirect to="/my-todos" />;
     }
 
