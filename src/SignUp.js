@@ -13,11 +13,18 @@ class SignUp extends Component {
         email: "",
         password: ""
       },
-      finished: false
+      finished: false,
+      error: null
     };
 
     this.handleInputs = this.handleInputs.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  componentWillUnmount() {
+    if (this.source) {
+      this.source.cancel("Operation canceled by the user.");
+    }
   }
 
   handleInputs(e) {
@@ -30,14 +37,25 @@ class SignUp extends Component {
   onSubmit(e) {
     e.preventDefault();
 
+    this.source = axios.CancelToken.source();
+
     axios
-      .post(`${API_ROOT}/register`, this.state.data)
+      .post(`${API_ROOT}/register`, this.state.data, {
+        cancelToken: this.source.token
+      })
       .then(() => this.setState({ finished: true }))
-      .catch(thrown => console.log(thrown));
+      .catch(err => {
+        if (axios.isCancel(err)) {
+          console.log("Request canceled", err.message);
+        } else {
+          // handle error
+          this.setState({ error: err.response.data.message });
+        }
+      });
   }
 
   render() {
-    const { data, finished, failed, status } = this.state;
+    const { data, finished, error } = this.state;
 
     if (finished) {
       return <Redirect to="/sign-in" />;
@@ -74,7 +92,7 @@ class SignUp extends Component {
               required
               value={data.password}
             />
-            {failed ? <p>{status}</p> : null}
+            {error ? <p style={{ color: "red" }}>{error}</p> : null}
             <br />
             <input type="submit" value="Sign up" />
           </form>

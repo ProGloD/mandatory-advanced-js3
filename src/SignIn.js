@@ -15,11 +15,18 @@ class SignIn extends Component {
       data: {
         email: "",
         password: ""
-      }
+      },
+      error: null
     };
 
     this.handleInputs = this.handleInputs.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  componentWillUnmount() {
+    if (this.source) {
+      this.source.cancel("Operation canceled by the user.");
+    }
   }
 
   handleInputs(e) {
@@ -34,14 +41,26 @@ class SignIn extends Component {
 
     const data = { ...this.state.data };
 
-    axios.post(`${API_ROOT}/auth`, data).then(response => {
-      updateToken(response.data.token);
-      this.setState({ signed: true });
-    });
+    this.source = axios.CancelToken.source();
+
+    axios
+      .post(`${API_ROOT}/auth`, data, { cancelToken: this.source.token })
+      .then(response => {
+        updateToken(response.data.token);
+        this.setState({ signed: true });
+      })
+      .catch(err => {
+        if (axios.isCancel(err)) {
+          console.log("Request canceled", err.message);
+        } else {
+          // handle error
+          this.setState({ error: err.response.data.message });
+        }
+      });
   }
 
   render() {
-    const { signed, data } = this.state;
+    const { signed, data, error } = this.state;
 
     if (signed) {
       return <Redirect to="/my-todos" />;
@@ -77,6 +96,7 @@ class SignIn extends Component {
               required
               value={data.password}
             />
+            <p style={{ color: "red" }}>{error}</p>
             <br />
             <input type="submit" value="Sign in" />
           </form>
