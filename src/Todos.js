@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 
@@ -118,8 +119,8 @@ class Todos extends Component {
     return (
       <>
         <nav>
-          <p>{email}</p>
           <ul>
+            <li>{email}</li>
             <li>
               <Link to="/" onClick={this.logOut}>
                 Log out
@@ -138,12 +139,18 @@ class Todos extends Component {
           </div>
           <div>
             <ul>
-              {todos.map(todo => (
-                <li key={todo.id}>
-                  {todo.content}{" "}
-                  <button onClick={() => this.removeTodo(todo)}>&times;</button>
-                </li>
-              ))}
+              <TransitionGroup>
+                {todos.map(todo => (
+                  <CSSTransition key={todo.id} classNames="todo" timeout={500}>
+                    <li>
+                      {todo.content}{" "}
+                      <button onClick={() => this.removeTodo(todo)}>
+                        &times;
+                      </button>
+                    </li>
+                  </CSSTransition>
+                ))}
+              </TransitionGroup>
             </ul>
           </div>
         </main>
